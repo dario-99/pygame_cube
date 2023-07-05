@@ -33,3 +33,9 @@ FOC_INC by default is equal to 0.1
 | 2 |$ zoom -=$ FOC_INC|
 | 3 |$ skew +=$ FOC_INC|
 | 4 |$ skew -=$ FOC_INC|
+| UP |$ z_{cam} -=$ SHIFT_INC|
+| DOWN |$ z_{cam} +=$ SHIFT_INC|
+| LEFT |$ x_{cam} +=$ SHIFT_INC|
+| RIGHT |$ x_{cam} -=$ SHIFT_INC|
+| SPACE |$ y_{cam} -=$ SHIFT_INC|
+| L_SHIFT |$ y_{cam} +=$ SHIFT_INC|
