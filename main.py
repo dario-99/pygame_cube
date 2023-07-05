@@ -4,8 +4,8 @@ import numpy as np
 from matrix import *
 
 # Constants
-WIN_HEIGHT = 800
-WIN_WIDTH = 800
+WIN_HEIGHT = 980
+WIN_WIDTH = 1820
 SCALE = 100
 ROTATE_SPEED = 0.001
 FOC_INC = 0.1
@@ -15,7 +15,7 @@ SHIFT_INC = 1
 clock = pygame.time.Clock()
 
 # Windows build
-window = pygame.display.set_mode((WIN_HEIGHT, WIN_WIDTH))
+window = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 pygame.font.init()
 
 # Starting Angle
@@ -40,44 +40,47 @@ cube = np.array(
 
 # Projection matrix
 focal_lenght = 1
-u0 = 0
-v0 = 0
+u0 = WIN_WIDTH//2
+v0 = WIN_HEIGHT//2
 skew = 0
-proj = intrinsic_matrix(focal_lenght, u0, v0, skew)
+pu = 1/(WIN_WIDTH//2)
+pv = 1/(WIN_HEIGHT//2)
+proj = intrinsic_matrix(focal_lenght, u0, v0, skew, pu, pv)
 
 # camera position in world coordinate
 camera_pos = np.array(
     [
         [0],
         [0],
-        [0],
+        [-2],
     ]
 )
+
 
 def draw_cube(cube):
     
     for i in range(8):
-        x = cube[0][i] * SCALE + WIN_HEIGHT//2
-        y = cube[1][i] * SCALE + WIN_WIDTH//2
+        x = cube[0][i]/cube[2][i]
+        y = cube[1][i]/cube[2][i]
         pygame.draw.circle(window, (255, 0, 0), (x, y), 5)
 
     #base
-    pygame.draw.line(window, (255, 255, 255), (cube[0][0]* SCALE + WIN_HEIGHT//2, cube[1][0]* SCALE + WIN_WIDTH//2) , (cube[0][1]* SCALE + WIN_HEIGHT//2, cube[1][1]* SCALE + WIN_WIDTH//2))
-    pygame.draw.line(window, (255, 255, 255), (cube[0][0]* SCALE + WIN_HEIGHT//2, cube[1][0]* SCALE + WIN_WIDTH//2) , (cube[0][4]* SCALE + WIN_HEIGHT//2, cube[1][4]* SCALE + WIN_WIDTH//2))
-    pygame.draw.line(window, (255, 255, 255), (cube[0][5]* SCALE + WIN_HEIGHT//2, cube[1][5]* SCALE + WIN_WIDTH//2) , (cube[0][1]* SCALE + WIN_HEIGHT//2, cube[1][1]* SCALE + WIN_WIDTH//2))
-    pygame.draw.line(window, (255, 255, 255), (cube[0][5]* SCALE + WIN_HEIGHT//2, cube[1][5]* SCALE + WIN_WIDTH//2) , (cube[0][4]* SCALE + WIN_HEIGHT//2, cube[1][4]* SCALE + WIN_WIDTH//2))
+    pygame.draw.line(window, (255, 255, 255), (cube[0][0]/cube[2][0], cube[1][0]/cube[2][0]) , (cube[0][1]/cube[2][1], cube[1][1]/cube[2][1]))
+    pygame.draw.line(window, (255, 255, 255), (cube[0][0]/cube[2][0], cube[1][0]/cube[2][0]) , (cube[0][4]/cube[2][4], cube[1][4]/cube[2][4]))
+    pygame.draw.line(window, (255, 255, 255), (cube[0][5]/cube[2][5], cube[1][5]/cube[2][5]) , (cube[0][1]/cube[2][1], cube[1][1]/cube[2][1]))
+    pygame.draw.line(window, (255, 255, 255), (cube[0][5]/cube[2][5], cube[1][5]/cube[2][5]) , (cube[0][4]/cube[2][4], cube[1][4]/cube[2][4]))
 
     #top
-    pygame.draw.line(window, (255, 255, 255), (cube[0][3]* SCALE + WIN_HEIGHT//2, cube[1][3]* SCALE + WIN_WIDTH//2) , (cube[0][7]* SCALE + WIN_HEIGHT//2, cube[1][7]* SCALE + WIN_WIDTH//2))
-    pygame.draw.line(window, (255, 255, 255), (cube[0][3]* SCALE + WIN_HEIGHT//2, cube[1][3]* SCALE + WIN_WIDTH//2) , (cube[0][2]* SCALE + WIN_HEIGHT//2, cube[1][2]* SCALE + WIN_WIDTH//2))
-    pygame.draw.line(window, (255, 255, 255), (cube[0][6]* SCALE + WIN_HEIGHT//2, cube[1][6]* SCALE + WIN_WIDTH//2) , (cube[0][7]* SCALE + WIN_HEIGHT//2, cube[1][7]* SCALE + WIN_WIDTH//2))
-    pygame.draw.line(window, (255, 255, 255), (cube[0][6]* SCALE + WIN_HEIGHT//2, cube[1][6]* SCALE + WIN_WIDTH//2) , (cube[0][2]* SCALE + WIN_HEIGHT//2, cube[1][2]* SCALE + WIN_WIDTH//2))
+    pygame.draw.line(window, (255, 255, 255), (cube[0][3]/cube[2][3], cube[1][3]/cube[2][3]) , (cube[0][7]/cube[2][7], cube[1][7]/cube[2][7]))
+    pygame.draw.line(window, (255, 255, 255), (cube[0][3]/cube[2][3], cube[1][3]/cube[2][3]) , (cube[0][2]/cube[2][2], cube[1][2]/cube[2][2]))
+    pygame.draw.line(window, (255, 255, 255), (cube[0][6]/cube[2][6], cube[1][6]/cube[2][6]) , (cube[0][7]/cube[2][7], cube[1][7]/cube[2][7]))
+    pygame.draw.line(window, (255, 255, 255), (cube[0][6]/cube[2][6], cube[1][6]/cube[2][6]) , (cube[0][2]/cube[2][2], cube[1][2]/cube[2][2]))
 
     #lateral
-    pygame.draw.line(window, (255, 255, 255), (cube[0][0]* SCALE + WIN_HEIGHT//2, cube[1][0]* SCALE + WIN_WIDTH//2) , (cube[0][3]* SCALE + WIN_HEIGHT//2, cube[1][3]* SCALE + WIN_WIDTH//2))
-    pygame.draw.line(window, (255, 255, 255), (cube[0][4]* SCALE + WIN_HEIGHT//2, cube[1][4]* SCALE + WIN_WIDTH//2) , (cube[0][7]* SCALE + WIN_HEIGHT//2, cube[1][7]* SCALE + WIN_WIDTH//2))
-    pygame.draw.line(window, (255, 255, 255), (cube[0][1]* SCALE + WIN_HEIGHT//2, cube[1][1]* SCALE + WIN_WIDTH//2) , (cube[0][2]* SCALE + WIN_HEIGHT//2, cube[1][2]* SCALE + WIN_WIDTH//2))
-    pygame.draw.line(window, (255, 255, 255), (cube[0][5]* SCALE + WIN_HEIGHT//2, cube[1][5]* SCALE + WIN_WIDTH//2) , (cube[0][6]* SCALE + WIN_HEIGHT//2, cube[1][6]* SCALE + WIN_WIDTH//2))
+    pygame.draw.line(window, (255, 255, 255), (cube[0][0]/cube[2][0], cube[1][0]/cube[2][0]) , (cube[0][3]/cube[2][3], cube[1][3]/cube[2][3]))
+    pygame.draw.line(window, (255, 255, 255), (cube[0][4]/cube[2][4], cube[1][4]/cube[2][4]) , (cube[0][7]/cube[2][7], cube[1][7]/cube[2][7]))
+    pygame.draw.line(window, (255, 255, 255), (cube[0][1]/cube[2][1], cube[1][1]/cube[2][1]) , (cube[0][2]/cube[2][2], cube[1][2]/cube[2][2]))
+    pygame.draw.line(window, (255, 255, 255), (cube[0][5]/cube[2][5], cube[1][5]/cube[2][5]) , (cube[0][6]/cube[2][6], cube[1][6]/cube[2][6]))
     
 def draw_coordinate_frame(proj):
     origin = np.array([
@@ -111,9 +114,9 @@ def draw_coordinate_frame(proj):
     y_axis = proj@y_axis
     z_axis = proj@z_axis
 
-    pygame.draw.line(window, (255,0,0), (origin[0][0]* SCALE + WIN_HEIGHT//2, origin[1][0]* SCALE + WIN_WIDTH//2), (x_axis[0][0]* SCALE + WIN_HEIGHT//2, x_axis[1][0]* SCALE + WIN_WIDTH//2))
-    pygame.draw.line(window, (0,255,0), (origin[0][0]* SCALE + WIN_HEIGHT//2, origin[1][0]* SCALE + WIN_WIDTH//2), (y_axis[0][0]* SCALE + WIN_HEIGHT//2, y_axis[1][0]* SCALE + WIN_WIDTH//2))
-    pygame.draw.line(window, (0,0,255), (origin[0][0]* SCALE + WIN_HEIGHT//2, origin[1][0]* SCALE + WIN_WIDTH//2), (z_axis[0][0]* SCALE + WIN_HEIGHT//2, z_axis[1][0]* SCALE + WIN_WIDTH//2))
+    pygame.draw.line(window, (255,0,0), (origin[0][0]/ origin[2][0], origin[1][0]/origin[2][0]), (x_axis[0][0]/ x_axis[2][0], x_axis[1][0]/ x_axis[2][0]))
+    pygame.draw.line(window, (0,255,0), (origin[0][0]/ origin[2][0], origin[1][0]/origin[2][0]), (y_axis[0][0]/ y_axis[2][0], y_axis[1][0]/ y_axis[2][0]))
+    pygame.draw.line(window, (0,0,255), (origin[0][0]/ origin[2][0], origin[1][0]/origin[2][0]), (z_axis[0][0]/ z_axis[2][0], z_axis[1][0]/ z_axis[2][0]))
 
 def print_values():
     myfont = pygame.font.SysFont("monospace", 15)
@@ -142,14 +145,11 @@ while True:
 
 
     R = rotation_matrix(angle_x, angle_y, angle_z)
-    K = intrinsic_matrix(focal_lenght, u0, v0, skew)
+    intrinsic = intrinsic_matrix(focal_lenght, u0, v0, skew)
 
     extrinsic = extrinsic_matrix(R, camera_pos)
-    # base = np.array([0,0,0,1])
-    # top = np.hstack([R.T, -R.T@camera_pos])
-    # extrinsic = np.vstack([top,base])
 
-    proj = K@extrinsic
+    proj = intrinsic@extrinsic
 
     proj_cube = proj@cube
 
@@ -163,7 +163,7 @@ while True:
             pygame.quit()
         keys = pygame.key.get_pressed()
         if keys[pygame.K_r]:
-            rot_speed_y = rot_speed_x = rot_speed_z = u0 = v0 = skew = 0
+            rot_speed_y = rot_speed_x = rot_speed_z = skew = 0
             focal_lenght = 1
         if keys[pygame.K_a]:
             rot_speed_y -= ROTATE_SPEED
