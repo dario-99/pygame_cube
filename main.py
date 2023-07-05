@@ -48,8 +48,6 @@ def draw_cube(cube, projection_matrix):
     for i in range(8):
         x = proj_cube[0][i] * SCALE + WIN_HEIGHT//2
         y = proj_cube[1][i] * SCALE + WIN_WIDTH//2
-        print(x,y)
-        print("--------")
         pygame.draw.circle(window, (255, 0, 0), (x, y), 5)
 
     #base
