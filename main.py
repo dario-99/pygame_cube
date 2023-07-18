@@ -115,6 +115,7 @@ def draw_coordinate_frame(proj):
         [0],
         [1]
     ])
+
     y_axis = np.array([
         [0],
         [1],
