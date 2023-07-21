@@ -42,7 +42,14 @@ def extrinsic_matrix(R, C):
     #  return R @ np.concatenate([np.eye(3), -C], axis=1)
 
 
-def intrinsic_matrix(focal_lenght=1, u0=400, v0=400, skew=0, pu=1/400, pv=1/400):
+def intrinsic_matrix(
+    focal_lenght=1,
+    u0=400,
+    v0=400,
+    skew=0,
+    pu=1/400,
+    pv=1/400
+):
     return np.array(
         [
             [focal_lenght/pu,            skew, u0, 0],
